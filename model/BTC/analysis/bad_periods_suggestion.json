@@ -1,0 +1,10 @@
+{
+  "threshold_used": {
+    "th_up": 0.527,
+    "th_dn": 0.527
+  },
+  "min_bets_per_bucket": 200,
+  "hit_floor": 0.5,
+  "suggest_block_weekdays": [],
+  "suggest_block_hours_utc": []
+}
