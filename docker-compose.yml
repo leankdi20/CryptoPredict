@@ -1,9 +1,10 @@
 version: "3.8"
 services:
-  predictor:
+  crypto_predictor:
     build: .
     container_name: crypto_predictor
-    restart: always
+    command: ["python", "main.py", "--loop"]
     volumes:
       - .:/app
-    working_dir: /app
+    restart: always
+
