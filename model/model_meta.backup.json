@@ -1,0 +1,165 @@
+{
+  "features_csv": "data/derived/BTCUSDT/features_1h.csv",
+  "model_pkl": "model/models/best_model_xgb.joblib",
+  "policy_thr_up": 0.53,
+  "policy_thr_down": 0.53,
+  "policy_min_ev": 0.02,
+  "policy_min_kelly": 0.02,
+  "price_yes": 0.53,
+  "policy_block_weekdays": [],
+  "policy_block_hours_utc": [],
+  "policy_block_months": [],
+  "train_windows": [
+    [
+      "2022-01-01",
+      "2022-07-01"
+    ],
+    [
+      "2022-07-01",
+      "2023-01-01"
+    ],
+    [
+      "2023-01-01",
+      "2023-07-01"
+    ],
+    [
+      "2023-07-01",
+      "2024-01-01"
+    ],
+    [
+      "2024-01-01",
+      "2024-07-01"
+    ],
+    [
+      "2024-07-01",
+      "2025-09-01"
+    ]
+  ],
+  "test_window": [
+    "2025-01-01",
+    "2026-01-01"
+  ],
+  "train_rows": 21688,
+  "val_rows": 2169,
+  "test_rows": 6743,
+  "metrics_test": {
+    "accuracy": 0.5272134064956251,
+    "f1": 0.4622132253711201,
+    "auc": 0.5281047690637972,
+    "confusion_matrix": [
+      [
+        2185,
+        1159
+      ],
+      [
+        2029,
+        1370
+      ]
+    ],
+    "classification_report": "\u2026"
+  },
+  "timeseries_cv": {
+    "splits": 5,
+    "accuracy_mean": 0.5245711123408966,
+    "accuracy_std": 0.004358908393473204,
+    "f1_mean": 0.5311495056888541,
+    "f1_std": 0.03434987456149521,
+    "auc_mean": 0.541058972975848,
+    "auc_std": 0.010521456749358643
+  },
+  "polymarket": {
+    "price_yes": 0.53,
+    "return_win": 0.8867924528301886,
+    "return_win_no": 1.127659574468085,
+    "breakeven_prob": 0.53,
+    "threshold_search": {
+      "grid_start": 0.5,
+      "grid_end": 0.6950000000000002,
+      "grid_step": 0.0050000000000000044,
+      "best": {
+        "threshold": 0.515,
+        "bets": 1892.0,
+        "winrate": 0.5465116279069767,
+        "total_profit": 58.94339622641496,
+        "avg_profit": 0.031154014918823976
+      }
+    }
+  },
+  "feat_cols": [
+    "ret_1",
+    "logret_1",
+    "ret_2",
+    "ret_3",
+    "ret_4",
+    "ret_6",
+    "ret_8",
+    "ret_24",
+    "vol_24",
+    "vol_72",
+    "sma_20",
+    "sma_50",
+    "sma_200",
+    "ema_20",
+    "ema_50",
+    "sma_ratio_20_50",
+    "sma_ratio_50_200",
+    "rsi_14",
+    "macd",
+    "macd_signal",
+    "macd_hist",
+    "bb_pos",
+    "vol_z20",
+    "quote_volume_usd",
+    "close_lag1",
+    "ret_1_lag1",
+    "body",
+    "range",
+    "upper_wick",
+    "lower_wick",
+    "body_pct",
+    "upper_wick_pct",
+    "lower_wick_pct",
+    "true_range",
+    "atr14",
+    "slope_sma20",
+    "trend_flag",
+    "vol_regime",
+    "sin_hour",
+    "cos_hour",
+    "sin_dow",
+    "cos_dow",
+    "body_over_atr",
+    "range_over_atr",
+    "close_sma20_atr"
+  ],
+  "random_state": 42,
+  "model_type": "xgboost_1h_calibrated_prefit",
+  "trainer": {
+    "mode": "WEEKLY_WF",
+    "half_life_days": 45,
+    "cal_days": 45,
+    "test_days": 7,
+    "max_train_months": 12,
+    "xgb_params": {
+      "n_estimators": 400,
+      "max_depth": 5,
+      "learning_rate": 0.05,
+      "subsample": 0.9,
+      "colsample_bytree": 0.9,
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0,
+      "objective": "binary:logistic",
+      "random_state": 42,
+      "n_jobs": 4
+    }
+  },
+  "threshold_search": {
+    "note": "Asim\u00e9trico elegido tras backtest con EV>=0.02 y Kelly>=0.03",
+    "production_thr_up": 0.53,
+    "production_thr_down": 0.51,
+    "pnl_total_asym_0.53_0.51": 297.522,
+    "pnl_total_sym_0.52": 296.41,
+    "dd_max_ref": 2.101,
+    "sharpe_ref": 0.149
+  }
+}

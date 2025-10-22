@@ -1,0 +1,15 @@
+# Núcleo científico
+numpy>=1.26
+pandas>=2.2
+
+# Modelado / métricas
+scikit-learn>=1.4
+xgboost>=2.0
+joblib>=1.3
+
+# Descargas HTTP
+requests>=2.31
+
+# Utilidades opcionales (logging bonito / manejo de zonas horarias)
+python-dateutil>=2.8
+ccxt>=3.0

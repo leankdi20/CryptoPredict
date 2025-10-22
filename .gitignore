@@ -1,0 +1,56 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Archivos temporales de sistema
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración local
+.env
+*.env
+
+# Archivos de caché de joblib, modelos y backups
+*.joblib
+*.backup
+*.bak
+*.checkpoint
+*.pth
+
+# Datos sensibles o generados
+/data/raw/
+/data/derived/
+/data/preprocessed/
+
+# Resultados de entrenamiento y logs
+/archivosextras/*.csv
+/archivosextras/*.txt
+/model/BTC/analysis/*.csv
+/model/BTC/analysis/*.json
+/model/BTC/analysis/*.txt
+/model/models/
+wallet_history.csv
+decisions_log.csv
+trading_log.txt
+training_log.txt
+
+# Salidas de pruebas o simulaciones
+/backtest_results.csv
+/model/*_meta.json
+
+# Archivos de Jupyter o notebooks (si los usás)
+*.ipynb
+.ipynb_checkpoints/
+
+# Docker / VSCode (opcional)
+.vscode/
+*.dockerfile
+docker-compose.override.yml
