@@ -3,11 +3,6 @@
 venv/
 
 # Archivos temporales de sistema
-*.log
-*.tmp
-*.swp
-.DS_Store
-Thumbs.db
 
 # Archivos compilados de Python
 __pycache__/
@@ -19,11 +14,7 @@ __pycache__/
 *.env
 
 # Archivos de caché de joblib, modelos y backups
-*.joblib
-*.backup
-*.bak
-*.checkpoint
-*.pth
+
 
 # Datos sensibles o generados
 
@@ -35,8 +26,6 @@ __pycache__/
 
 
 # Archivos de Jupyter o notebooks (si los usás)
-*.ipynb
-.ipynb_checkpoints/
 
 # Docker / VSCode (opcional)
 .vscode/
