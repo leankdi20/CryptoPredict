@@ -11,6 +11,13 @@ import subprocess
 # ✅ IMPORT CORRECTO
 from src.sim.wallet_tracker import update_wallet
 
+from pathlib import Path
+
+LOCK_PATH = Path("archivosextras/.hourly.lock")
+if LOCK_PATH.exists():
+    print("🧹 Eliminando lock residual...")
+    LOCK_PATH.unlink()
+
 # ── Paths / entorno ────────────────────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent
 PY   = sys.executable
