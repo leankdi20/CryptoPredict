@@ -1,23 +1,72 @@
-from flask import Flask, render_template, render_template_string
+from flask import Flask, render_template
 import pandas as pd
 from pathlib import Path
 
 app = Flask(__name__)
 
 @app.route('/')
-def tabla():
+def dashboard():
+    # === Ruta absoluta al CSV ===
     BASE_DIR = Path(__file__).resolve().parent.parent
     df_path = BASE_DIR / "archivosextras" / "wallet_history.csv"
 
+    # Mostrar mensaje si el archivo no existe
+    if not df_path.exists():
+        return f"<h3 style='color:red;'>⚠️ No se encontró el archivo: {df_path}</h3>", 404
+
+    # === Cargar CSV ===
     df = pd.read_csv(df_path)
-    # Opcional: redondear o formatear números
-    if 'profit' in df.columns:
-        df['profit'] = df['profit'].round(3)
-    if 'balance_after' in df.columns:
-        df['balance_after'] = df['balance_after'].round(2)
 
-    table_html = df.to_html(classes='table table-striped table-hover table-bordered', index=False)
-    return render_template('dashboard.html', table=table_html)
+    # Asegurar que las columnas esperadas existan
+    required_cols = ["ts_settle", "pnl", "result"]
+    for col in required_cols:
+        if col not in df.columns:
+            return f"<h3 style='color:red;'>❌ Falta la columna '{col}' en {df_path.name}</h3>", 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000,  debug=True)
+    # === Ordenar de más reciente a más antigua ===
+    df["ts_settle"] = pd.to_datetime(df["ts_settle"], errors="coerce")
+    df = df.sort_values("ts_settle", ascending=False).reset_index(drop=True)
+
+    # === Datos para tabla ===
+    headers = df.columns.tolist()
+    data = df.to_dict(orient="records")
+
+    # === Gráfico: ganancias/pérdidas por día ===
+    df["date"] = df["ts_settle"].dt.date
+    chart_data = df.groupby("date")["pnl"].sum().reset_index()
+    chart_labels = chart_data["date"].astype(str).tolist()
+    chart_values = chart_data["pnl"].round(2).tolist()
+
+    # === “No_Bet” logs ===
+    nobet_rows = df[df["result"].str.upper() == "NO_BET"][["ts_entry", "result"]].copy() if "ts_entry" in df.columns else pd.DataFrame()
+    nobets = nobet_rows.rename(columns={"ts_entry": "timestamp", "result": "reason"}).tail(15).to_dict(orient="records")
+
+        # === Estadísticas resumen ===
+    total_bets = len(df[df["result"].isin(["WIN", "LOSE"])])
+    wins = len(df[df["result"] == "WIN"])
+    losses = len(df[df["result"] == "LOSE"])
+
+    win_pct = round((wins / total_bets) * 100, 2) if total_bets > 0 else 0
+    loss_pct = round((losses / total_bets) * 100, 2) if total_bets > 0 else 0
+    total_pnl = round(df["pnl"].sum(), 2)
+
+
+    # === Renderizar plantilla ===
+    return render_template(
+        "dashboard.html",
+        headers=headers,
+        data=data,
+        chart_labels=chart_labels,
+        chart_values=chart_values,
+        nobets=nobets,
+        total_bets=total_bets,
+        wins=wins,
+        losses=losses,
+        win_pct=win_pct,
+        loss_pct=loss_pct,
+        total_pnl=total_pnl
+    )
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
