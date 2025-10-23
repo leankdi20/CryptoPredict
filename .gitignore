@@ -13,9 +13,9 @@ __pycache__/
 .env
 *.env
 
-# Archivos de caché de joblib, modelos y backups
-
-
+# Ignorar CSV y archivos temporales
+*.csv
+archivosextras/
 # Datos sensibles o generados
 
 

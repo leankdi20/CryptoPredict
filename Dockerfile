@@ -1,13 +1,12 @@
 FROM python:3.12-slim
 
-# Establece el directorio de trabajo
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia los archivos
-COPY . /app
+COPY . .
 
-# Instala las dependencias
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# puerto por defecto para Flask/Gunicorn
+EXPOSE 5000
 
-# Comando por defecto
-CMD ["python", "main.py", "--loop"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]

@@ -1,10 +1,34 @@
-version: "3.8"
+
 services:
-  crypto_predictor:
+  predictor:
     build: .
-    container_name: crypto_predictor
+    container_name: predictor
     command: ["python", "main.py", "--loop"]
     volumes:
       - .:/app
     restart: always
 
+  flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    working_dir: /app/front
+    command: gunicorn --bind 0.0.0.0:5000 app:app
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - .:/app
+    ports:
+      - "5001:5000"
+    restart: always
+
+    nginx:
+      image: nginx:alpine
+      container_name: nginx_proxy
+      ports:
+        - "80:80"
+      volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      depends_on:
+        - flask_app
