@@ -1,5 +1,5 @@
 from pathlib import Path
-import subprocess, sys, os, datetime
+import subprocess, sys, os, datetime, time
 
 # === Config básica ===
 BASE = Path(__file__).resolve().parent
@@ -14,22 +14,24 @@ ENV = os.environ.copy()
 ENV["PYTHONIOENCODING"] = "utf-8"
 ENV["PYTHONUTF8"] = "1"
 
-# Cada entrada puede ser:
-# - "package.module"  -> se ejecuta con: python -m package.module
-# - "path/to/script.py" -> se ejecuta pasándole la ruta al intérprete
-# - ("module_or_path", ["arg1", "arg2"])
+# === Scripts a ejecutar semanalmente ===
 SCRIPTS = [
     ("src.features.feature_engineering", []),
     ("model.train.train_model", []),
     ("src.backtest.backtest_strategy", []),
-    ("model.BTC.analyse.eval_threshold", []), 
-    ("model.BTC.analyse.find_bad_periods", []),  # ← nuevo paso semanal
-    ("scripts.update_thresholds_meta", []), 
+    ("model.BTC.analyse.eval_threshold", []),
+    ("model.BTC.analyse.find_bad_periods", []),
+    ("scripts.update_thresholds_meta", []),
     ("model.BTC.analyse.update_bad_periods_meta", []),
 ]
 
+# === Intervalo de espera entre ciclos ===
+# (7 días = 7 * 24 * 3600 segundos)
+SLEEP_SECONDS = 7 * 24 * 3600
+
 
 def run(entry):
+    """Ejecuta un módulo o script con logging."""
     if isinstance(entry, tuple):
         script, args = entry
     else:
@@ -39,12 +41,10 @@ def run(entry):
     run_as_module = False
     script_path = BASE / script
     if script.endswith(".py") or script_path.exists():
-        # usar ruta de archivo si existe o si explícitamente tiene .py
         script_file = script_path if script_path.exists() else Path(script)
         cmd = [PY, "-u", str(script_file)] + args
         label = str(script_file)
     else:
-        # intentar como módulo
         run_as_module = True
         cmd = [PY, "-u", "-m", script] + args
         label = f"-m {script}"
@@ -85,8 +85,18 @@ def run(entry):
         if code != 0:
             raise SystemExit(code)
 
-if __name__ == "__main__":
-    print(f"🏁 Iniciando ciclo de entrenamiento con {PY}...")
+
+def ciclo_entrenamiento():
+    """Ejecuta la lista completa de scripts."""
+    print(f"🏁 Iniciando ciclo de entrenamiento con {PY} ({datetime.datetime.now()})")
     for s in SCRIPTS:
         run(s)
-    print(f"✅ Entrenamiento OK. Ver log: {LOG}")
+    print(f"✅ Entrenamiento completado ({datetime.datetime.now()}). Ver log: {LOG}\n")
+
+
+if __name__ == "__main__":
+    print("🕒 Scheduler semanal iniciado. Ctrl+C para detener.\n")
+    while True:
+        ciclo_entrenamiento()
+        print(f"😴 Durmiendo por {SLEEP_SECONDS/3600/24:.1f} días...\n")
+        time.sleep(SLEEP_SECONDS)

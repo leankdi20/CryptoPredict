@@ -37,10 +37,10 @@ TEST_WINDOW = ("2025-01-01", "2026-01-01")
 
 # Ventanas dinámicas (si usas WEEKLY_WF)
 TEST_DAYS         = 7            # bloque de TEST = 1 semana (168 velas)
-CAL_DAYS          = 45           # bloque de calibración previo al TEST
-HALF_LIFE_DAYS    = 45           # pesos exponenciales (más peso a lo reciente)
-MAX_TRAIN_MONTHS  = 12           # histórico máximo usado para entrenar (rolling)
-
+CAL_DAYS          = 30           # bloque de calibración previo al TEST
+HALF_LIFE_DAYS    = 15           # pesos exponenciales (más peso a lo reciente)
+MAX_TRAIN_MONTHS  = 9           # histórico máximo usado para entrenar (rolling)
+N_WEEKS = 8  
 # Modelo base XGB
 XGB_PARAMS = dict(
     n_estimators=400, max_depth=5, learning_rate=0.05,
@@ -174,9 +174,15 @@ def train_weekly_walkforward(X, y, dts, feat_cols, meta):
     best, best_ll = None, 1e9
     cutoffs = _weekly_cutoffs(dts, start="2022-01-01")
 
+    N_WEEKS = 8  # o 12 si querés más historia
+    if len(cutoffs) > N_WEEKS:
+        cutoffs = cutoffs[-N_WEEKS:]
+
+    print(f"📆 Usando las últimas {len(cutoffs)} semanas (hasta {cutoffs[-1].date()})")
+
     # thresholds de política desde meta (fallback 0.5)
-    thr_up   = float(meta.get("policy_thr_up",   0.5))
-    thr_down = float(meta.get("policy_thr_down", 0.5))
+    thr_up   = float(meta.get("policy_thr_up",   0.6))
+    thr_down = float(meta.get("policy_thr_down", 0.6))
 
     iter_idx = 0
     for week_end in cutoffs:
