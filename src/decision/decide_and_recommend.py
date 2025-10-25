@@ -93,12 +93,19 @@ def main():
             "src": src
         }
 
+        # --- Evitar duplicados ---
         if NO_BET_CSV.exists():
-            pd.DataFrame([no_bet_row]).to_csv(NO_BET_CSV, mode="a", header=False, index=False)
+            df_nb = pd.read_csv(NO_BET_CSV)
+            # Convertir timestamp a string para comparar sin errores de tipo
+            if str(ts_candle) in df_nb["timestamp"].astype(str).values:
+                print(f"⚠️ NO_BET ya registrado para {ts_candle}, se omite guardado.")
+            else:
+                pd.DataFrame([no_bet_row]).to_csv(NO_BET_CSV, mode="a", header=False, index=False)
+                print(f"✅ NO_BET registrado en {NO_BET_CSV}")
         else:
             pd.DataFrame([no_bet_row]).to_csv(NO_BET_CSV, index=False)
+            print(f"✅ NO_BET registrado en {NO_BET_CSV} (nuevo archivo)")
 
-        print(f"🚫 NO_BET registrado en {NO_BET_CSV}")
         return  # sale después de guardar el no_bet
 
     # === Si hay apuesta (BET_UP o BET_DOWN) ===
