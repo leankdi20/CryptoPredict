@@ -38,8 +38,14 @@ def dashboard():
     chart_values = chart_data["pnl"].round(2).tolist()
 
     # === “No_Bet” logs ===
-    nobet_rows = df[df["result"].str.upper() == "NO_BET"][["ts_entry", "result"]].copy() if "ts_entry" in df.columns else pd.DataFrame()
-    nobets = nobet_rows.rename(columns={"ts_entry": "timestamp", "result": "reason"}).tail(15).to_dict(orient="records")
+    nobet_path = BASE_DIR / "archivosextras" / "no_bet_log.csv"
+    if nobet_path.exists():
+        nobet_df = pd.read_csv(nobet_path, parse_dates=["timestamp"])
+        nobet_df = nobet_df.sort_values("timestamp", ascending=False).head(15)
+        nobets = nobet_df.to_dict(orient="records")
+    else:
+        nobets = ["No hay registros de NO_BET."]
+
 
         # === Estadísticas resumen ===
     total_bets = len(df[df["result"].isin(["WIN", "LOSE"])])

@@ -75,13 +75,33 @@ def main():
     start_et, end_et, end_utc, end_cr = _et_window_from_now()
     print("────────────────────────────────────────────────────────")
     print(f"🕒 Polymarket (ET): {_fmt_hour(start_et)}–{_fmt_hour(end_et)} ET | "
-          f"cierra {end_et.strftime('%Y-%m-%d %H:%M:%S %Z')} "
-          f"(UTC {end_utc.strftime('%H:%M')}, CR {end_cr.strftime('%H:%M')})")
+        f"cierra {end_et.strftime('%Y-%m-%d %H:%M:%S %Z')} "
+        f"(UTC {end_utc.strftime('%H:%M')}, CR {end_cr.strftime('%H:%M')})")
     print("────────────────────────────────────────────────────────")
 
-    if decision == "NO_BET":
-        return
+    # === Guardar logs ===
+    LOG_CSV.parent.mkdir(parents=True, exist_ok=True)
+    NO_BET_CSV = ROOT / "archivosextras" / "no_bet_log.csv"
 
+    # Si es NO_BET → guardar en archivo especial y salir
+    if decision == "NO_BET":
+        no_bet_row = {
+            "timestamp": ts_candle,
+            "reason": "NO_BET",
+            "p_up": round(p_up, 6),
+            "p_down": round(p_down, 6),
+            "src": src
+        }
+
+        if NO_BET_CSV.exists():
+            pd.DataFrame([no_bet_row]).to_csv(NO_BET_CSV, mode="a", header=False, index=False)
+        else:
+            pd.DataFrame([no_bet_row]).to_csv(NO_BET_CSV, index=False)
+
+        print(f"🚫 NO_BET registrado en {NO_BET_CSV}")
+        return  # sale después de guardar el no_bet
+
+    # === Si hay apuesta (BET_UP o BET_DOWN) ===
     row = {
         "ts_entry": ts_entry,
         "ts_settle": ts_settle,
@@ -97,19 +117,17 @@ def main():
         "src": src,
         "close": close,
     }
-    
-
 
     try:
         df_log = pd.read_csv(LOG_CSV, parse_dates=["ts_entry", "ts_settle"])
     except FileNotFoundError:
         df_log = pd.DataFrame()
 
-    # --- Evitar duplicados (por misma hora de apuesta/liquidación)
     exists = (
         not df_log.empty and
         ((df_log["ts_entry"] == ts_entry) & (df_log["ts_settle"] == ts_settle)).any()
     )
+
     if exists:
         print(f"⚠️ Ya existe una apuesta para {ts_entry} → {ts_settle}, no se duplicará.")
     else:
@@ -117,6 +135,7 @@ def main():
         df_log.sort_values("ts_entry", inplace=True)
         df_log.to_csv(LOG_CSV, index=False)
         print(f"✅ Apuesta guardada en log ({ts_entry} → {ts_settle}).")
+
 
 if __name__ == "__main__":
     main()
