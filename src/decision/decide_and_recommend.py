@@ -108,6 +108,7 @@ def main():
 
         return  # sale después de guardar el no_bet
 
+
     # === Si hay apuesta (BET_UP o BET_DOWN) ===
     row = {
         "ts_entry": ts_entry,
